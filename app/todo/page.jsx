@@ -14,7 +14,7 @@ const TodoPage = () => {
 
   const fetchTasks = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/tasks?userId=${userId}`);
+    const res = await fetch(`${API_BASE_URL}/api/tasks?userId=${userId}`); 
     const data = await res.json();
 
     // ✅ Safety check to avoid crash on bad response
@@ -47,7 +47,7 @@ const TodoPage = () => {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/api/tasks`, {
+    const res = await fetch(`${API_BASE_URL}//api/tasks?userId=${userId}`, { 
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -81,7 +81,7 @@ const TodoPage = () => {
   };
 
   const deleteTask = async (id) => {
-    await fetch(`${API_BASE_URL}/api/tasks/${id}`, { method: "DELETE" });
+    await fetch(`${API_BASE_URL}/api/tasks?userId=${userId}`, { method: "DELETE" });
     fetchTasks();
   };
 
