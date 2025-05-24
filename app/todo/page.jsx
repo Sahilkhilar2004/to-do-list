@@ -13,76 +13,64 @@ const TodoPage = () => {
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
   const fetchTasks = async () => {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/tasks?userId=${userId}`); 
-    const data = await res.json();
-    console.log("Fetched tasks:", data);
-
-    // ✅ Safety check to avoid crash on bad response
-    if (Array.isArray(data)) {
-      setTasks(data);
-    } else {
-      console.warn("Unexpected task data:", data);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/tasks?userId=${userId}`);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setTasks(data);
+      } else {
+        console.warn("Unexpected task data:", data);
+        setTasks([]);
+      }
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
       setTasks([]);
     }
-  } catch (error) {
-    console.error("Error fetching tasks:", error);
-    setTasks([]);
-  }
-};
+  };
 
   useEffect(() => {
     if (!userId) {
-      router.push("/login"); // Redirect to login if not logged in
+      router.push("/login");
     } else {
       fetchTasks();
     }
   }, [userId]);
 
   const addTask = async (e) => {
-  e.preventDefault();
-  if (!title || !desc) {
-    alert("Please fill in both title and description.");
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/tasks`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, title, description: desc }),
-    });
-
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || "Failed to add task.");
+    e.preventDefault();
+    if (!title || !desc) {
+      alert("Please fill in both title and description.");
+      return;
     }
 
-    await fetchTasks(); // Refresh task list
-    setTitle("");
-    setDesc("");
-  } catch (error) {
-    console.error("Error adding task:", error);
-  }
-};
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, title, description: desc }),
+      });
 
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to add task.");
+      }
 
-
-
-    setTitle("");
-    setDesc("");
-    fetchTasks();
+      await fetchTasks();
+      setTitle("");
+      setDesc("");
+    } catch (error) {
+      console.error("Error adding task:", error);
+    }
   };
 
- const deleteTask = async (id) => {
-  try {
-    await fetch(`${API_BASE_URL}/api/tasks/${id}`, { method: "DELETE" });
-    fetchTasks();
-  } catch (error) {
-    console.error("Error deleting task:", error);
-  }
-};
-
+  const deleteTask = async (id) => {
+    try {
+      await fetch(`${API_BASE_URL}/api/tasks/${id}`, { method: "DELETE" });
+      fetchTasks();
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
@@ -111,43 +99,31 @@ const TodoPage = () => {
           placeholder="Description"
           className="m-2 p-2 border w-96"
         />
-        <button className="bg-green-500 text-white px-4 py-2 rounded">Add Task</button>
+        <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Add Task</button>
       </form>
 
       <ul className="space-y-4">
         {tasks.length === 0 ? (
-          <li>No tasks found.</li>
+          <li className="text-gray-600">No tasks found.</li>
         ) : (
-
-        <ul className="space-y-4">
-  {Array.isArray(tasks) && tasks.length > 0 ? (
-    tasks.map((task) => (
-      <li key={task.id} className="flex justify-between items-center border p-2 rounded">
-        <div>
-          <h3 className="font-semibold text-xl">{task.title}</h3>
-          <p>{task.description}</p>
-        </div>
-        <button onClick={() => deleteTask(task.id)} className="bg-red-500 text-white px-3 py-1 rounded">
-          Delete
-        </button>
-      </li>
-    ))
-  ) : (
-    <li className="text-gray-600">No tasks found.</li>
-  )}
-</ul>
-
-
-
-
+          tasks.map((task) => (
+            <li key={task.id} className="flex justify-between items-center border p-2 rounded">
+              <div>
+                <h3 className="font-semibold text-xl">{task.title}</h3>
+                <p>{task.description}</p>
+              </div>
+              <button
+                onClick={() => deleteTask(task.id)}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
+                Delete
+              </button>
+            </li>
+          ))
         )}
       </ul>
     </div>
   );
-
+};
 
 export default TodoPage;
-
-
-
-
