@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -43,7 +44,7 @@ app.get('/', (req, res) => {
 
 
 // ✅ Login Route
-const bcrypt = require('bcrypt');
+
 
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
@@ -123,7 +124,7 @@ app.delete('/api/tasks/:taskId', async (req, res) => {
   }
 });
 
-const bcrypt = require("bcrypt"); // Ensure this is imported at the top
+
 
 app.post("/api/register", async (req, res) => {
   const { username, password } = req.body;
