@@ -43,21 +43,34 @@ app.get('/', (req, res) => {
 
 
 // ✅ Login Route
+const bcrypt = require('bcrypt');
+
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
+    // Get user by username
     const result = await pool.query(
-      'SELECT * FROM users WHERE username = $1 AND password = $2',
-      [username, password]
+      'SELECT * FROM users WHERE username = $1',
+      [username]
     );
 
-    if (result.rows.length > 0) {
-      res.json({ success: true, userId: result.rows[0].id });
-    } else {
-      res.status(401).json({ success: false, message: 'Invalid credentials' });
+    if (result.rows.length === 0) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
+
+    const user = result.rows[0];
+
+    // Compare hashed password
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    res.json({ success: true, userId: user.id });
+
   } catch (err) {
-    console.error(err);
+    console.error('Login error:', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
