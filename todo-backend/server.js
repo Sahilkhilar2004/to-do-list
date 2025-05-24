@@ -11,13 +11,15 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // PostgreSQL Pool Setup
+require('dotenv').config(); // make sure this is at the top
+
+
+
 const pool = new Pool({
-  user: 'postgres',             // Your PostgreSQL username
-  host: 'localhost',
-  database: 'todo_app',         // Your database name
-  password: 'anjali18',    // Your pgAdmin password
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
+
 
 // ✅ Root Route
 app.get('/', (req, res) => {
