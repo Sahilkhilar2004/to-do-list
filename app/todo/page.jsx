@@ -2,6 +2,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "../config";
 
 const TodoPage = () => {
   const [title, setTitle] = useState("");
@@ -12,7 +13,7 @@ const TodoPage = () => {
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
   const fetchTasks = async () => {
-    const res = await fetch(`http://localhost:5000/api/tasks/${userId}`);
+      const res = await fetch(`${API_BASE_URL}/api/tasks/${userId}`);
     const data = await res.json();
     setTasks(data);
   };
@@ -29,7 +30,7 @@ const TodoPage = () => {
     e.preventDefault();
     if (!title || !desc) return;
 
-    await fetch("http://localhost:5000/api/tasks", {
+    await fetch(`${API_BASE_URL}/api/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId, title, description: desc }),
@@ -41,7 +42,7 @@ const TodoPage = () => {
   };
 
   const deleteTask = async (id) => {
-    await fetch(`http://localhost:5000/api/tasks/${id}`, { method: "DELETE" });
+    await fetch(`${API_BASE_URL}/api/tasks/${id}`, { method: "DELETE" });
     fetchTasks();
   };
 

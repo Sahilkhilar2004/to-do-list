@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "../config";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
@@ -10,7 +11,7 @@ const RegisterPage = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    const res = await fetch("http://localhost:5000/api/register", {
+   const res = await fetch(`${API_BASE_URL}/api/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
