@@ -110,52 +110,46 @@ app.delete('/api/tasks/:taskId', async (req, res) => {
   }
 });
 
-// ✅ Register Route
-app.post('/api/register', async (req, res) => {
+const bcrypt = require("bcrypt"); // Ensure this is imported at the top
+
+app.post("/api/register", async (req, res) => {
   const { username, password } = req.body;
+
+  console.log("📥 Incoming registration request:", req.body);
+
+  if (!username || !password) {
+    console.log("❌ Missing username or password");
+    return res.status(400).json({ success: false, message: "Username and password are required" });
+  }
+
   try {
-    const existing = await pool.query(
-      'SELECT * FROM users WHERE username = $1',
+    const existingUser = await pool.query(
+      "SELECT * FROM users WHERE username = $1",
       [username]
     );
 
-    if (existing.rows.length > 0) {
-      return res.status(409).json({ success: false, message: 'Username already taken' });
+    if (existingUser.rows.length > 0) {
+      console.log("⚠️ Username already exists");
+      return res.status(409).json({ success: false, message: "Username already exists" });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id',
-      [username, password]
+      "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id",
+      [username, hashedPassword]
     );
+
+    console.log("✅ User registered with ID:", result.rows[0].id);
 
     res.status(201).json({ success: true, userId: result.rows[0].id });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// ✅ Register Route
-app.post("/api/register", async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const existingUser = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
-
-    if (existingUser.rows.length > 0) {
-      return res.status(400).json({ success: false, message: "Username already exists" });
-    }
-
-    await pool.query(
-      "INSERT INTO users (username, password) VALUES ($1, $2)",
-      [username, password]
-    );
-
-    res.json({ success: true, message: "User registered successfully" });
-  } catch (err) {
-    console.error(err);
+    console.error("❌ Error during registration:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
 
 
 
