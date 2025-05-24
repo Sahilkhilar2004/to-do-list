@@ -8,7 +8,12 @@ const PORT = process.env.PORT || 5000;
 
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "to-do-list-cyan-rho.vercel.app",
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
 
 // PostgreSQL Pool Setup
