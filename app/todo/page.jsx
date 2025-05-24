@@ -41,21 +41,16 @@ const TodoPage = () => {
 
   const addTask = async (e) => {
   e.preventDefault();
-
   if (!title || !desc) {
     alert("Please fill in both title and description.");
     return;
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/api/tasks?userId=${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/api/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId,
-        title,
-        description: desc,
-      }),
+      body: JSON.stringify({ userId, title, description: desc }),
     });
 
     if (!res.ok) {
@@ -63,10 +58,7 @@ const TodoPage = () => {
       throw new Error(errorData.message || "Failed to add task.");
     }
 
-    // ✅ Refresh task list
-    await fetchTasks();
-
-    // ✅ Clear form
+    await fetchTasks(); // Refresh task list
     setTitle("");
     setDesc("");
   } catch (error) {
@@ -76,15 +68,21 @@ const TodoPage = () => {
 
 
 
+
     setTitle("");
     setDesc("");
     fetchTasks();
   };
 
-  const deleteTask = async (id) => {
-    await fetch(`${API_BASE_URL}/api/tasks?userId=${userId}`, { method: "DELETE" });
+ const deleteTask = async (id) => {
+  try {
+    await fetch(`${API_BASE_URL}/api/tasks/${id}`, { method: "DELETE" });
     fetchTasks();
-  };
+  } catch (error) {
+    console.error("Error deleting task:", error);
+  }
+};
+
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
@@ -121,7 +119,7 @@ const TodoPage = () => {
           <li>No tasks found.</li>
         ) : (
 
-          {Array.isArray(tasks) && tasks.length > 0 ? (
+         {Array.isArray(tasks) && tasks.length > 0 ? (
   tasks.map((task) => (
     <li key={task.id} className="flex justify-between items-center border p-2 rounded">
       <div>
@@ -134,8 +132,9 @@ const TodoPage = () => {
     </li>
   ))
 ) : (
-  <p className="text-gray-600">No tasks found.</p>
+  <li>No tasks found.</li>
 )}
+
 
 
         )}
