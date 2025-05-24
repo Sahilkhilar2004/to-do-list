@@ -48,7 +48,7 @@ const TodoPage = () => {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}//api/tasks?userId=${userId}`, { 
+    const res = await fetch(`${API_BASE_URL}/api/tasks?userId=${userId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -63,17 +63,17 @@ const TodoPage = () => {
       throw new Error(errorData.message || "Failed to add task.");
     }
 
-    // Optional: Clear inputs after adding task
+    // ✅ Refresh task list
+    await fetchTasks();
+
+    // ✅ Clear form
     setTitle("");
     setDesc("");
-
-    // Re-fetch tasks
-    fetchTasks();
   } catch (error) {
-    console.error("Error adding task:", error.message);
-    alert("Something went wrong while adding the task.");
+    console.error("Error adding task:", error);
   }
 };
+
 
 
     setTitle("");
