@@ -39,14 +39,41 @@ const TodoPage = () => {
   }, [userId]);
 
   const addTask = async (e) => {
-    e.preventDefault();
-    if (!title || !desc) return;
+  e.preventDefault();
 
-    await fetch(`${API_BASE_URL}/api/tasks`, {
+  if (!title || !desc) {
+    alert("Please fill in both title and description.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, title, description: desc }),
+      body: JSON.stringify({
+        userId,
+        title,
+        description: desc,
+      }),
     });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Failed to add task.");
+    }
+
+    // Optional: Clear inputs after adding task
+    setTitle("");
+    setDesc("");
+
+    // Re-fetch tasks
+    fetchTasks();
+  } catch (error) {
+    console.error("Error adding task:", error.message);
+    alert("Something went wrong while adding the task.");
+  }
+};
+
 
     setTitle("");
     setDesc("");
