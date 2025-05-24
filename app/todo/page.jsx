@@ -16,6 +16,7 @@ const TodoPage = () => {
   try {
     const res = await fetch(`${API_BASE_URL}/api/tasks?userId=${userId}`); 
     const data = await res.json();
+    console.log("Fetched tasks:", data);
 
     // ✅ Safety check to avoid crash on bad response
     if (Array.isArray(data)) {
@@ -141,7 +142,7 @@ const TodoPage = () => {
       </ul>
     </div>
   );
-};
+
 
 export default TodoPage;
 
