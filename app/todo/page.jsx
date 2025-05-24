@@ -13,10 +13,22 @@ const TodoPage = () => {
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
   const fetchTasks = async () => {
-      const res = await fetch(`${API_BASE_URL}/api/tasks/${userId}`);
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/tasks?userId=${userId}`);
     const data = await res.json();
-    setTasks(data);
-  };
+
+    // ✅ Safety check to avoid crash on bad response
+    if (Array.isArray(data)) {
+      setTasks(data);
+    } else {
+      console.warn("Unexpected task data:", data);
+      setTasks([]);
+    }
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    setTasks([]);
+  }
+};
 
   useEffect(() => {
     if (!userId) {
@@ -80,17 +92,24 @@ const TodoPage = () => {
         {tasks.length === 0 ? (
           <li>No tasks found.</li>
         ) : (
-          tasks.map((task) => (
-            <li key={task.id} className="flex justify-between items-center border p-2 rounded">
-              <div>
-                <h3 className="font-semibold text-xl">{task.title}</h3>
-                <p>{task.description}</p>
-              </div>
-              <button onClick={() => deleteTask(task.id)} className="bg-red-500 text-white px-3 py-1 rounded">
-                Delete
-              </button>
-            </li>
-          ))
+
+          {Array.isArray(tasks) && tasks.length > 0 ? (
+  tasks.map((task) => (
+    <li key={task.id} className="flex justify-between items-center border p-2 rounded">
+      <div>
+        <h3 className="font-semibold text-xl">{task.title}</h3>
+        <p>{task.description}</p>
+      </div>
+      <button onClick={() => deleteTask(task.id)} className="bg-red-500 text-white px-3 py-1 rounded">
+        Delete
+      </button>
+    </li>
+  ))
+) : (
+  <p className="text-gray-600">No tasks found.</p>
+)}
+
+
         )}
       </ul>
     </div>

@@ -78,8 +78,8 @@ app.post('/api/login', async (req, res) => {
 
 
 // ✅ Get Tasks by User ID
-app.get('/api/tasks/:userId', async (req, res) => {
-  const { userId } = req.params;
+app.get('/api/tasks', async (req, res) => {
+  const { userId } = req.query;
   try {
     const result = await pool.query(
       'SELECT * FROM tasks WHERE user_id = $1',
@@ -91,6 +91,7 @@ app.get('/api/tasks/:userId', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
 
 
 // ✅ Add a Task
