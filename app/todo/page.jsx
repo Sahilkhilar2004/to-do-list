@@ -119,21 +119,24 @@ const TodoPage = () => {
           <li>No tasks found.</li>
         ) : (
 
-         {Array.isArray(tasks) && tasks.length > 0 ? (
-  tasks.map((task) => (
-    <li key={task.id} className="flex justify-between items-center border p-2 rounded">
-      <div>
-        <h3 className="font-semibold text-xl">{task.title}</h3>
-        <p>{task.description}</p>
-      </div>
-      <button onClick={() => deleteTask(task.id)} className="bg-red-500 text-white px-3 py-1 rounded">
-        Delete
-      </button>
-    </li>
-  ))
-) : (
-  <li>No tasks found.</li>
-)}
+        <ul className="space-y-4">
+  {Array.isArray(tasks) && tasks.length > 0 ? (
+    tasks.map((task) => (
+      <li key={task.id} className="flex justify-between items-center border p-2 rounded">
+        <div>
+          <h3 className="font-semibold text-xl">{task.title}</h3>
+          <p>{task.description}</p>
+        </div>
+        <button onClick={() => deleteTask(task.id)} className="bg-red-500 text-white px-3 py-1 rounded">
+          Delete
+        </button>
+      </li>
+    ))
+  ) : (
+    <li className="text-gray-600">No tasks found.</li>
+  )}
+</ul>
+
 
 
 
